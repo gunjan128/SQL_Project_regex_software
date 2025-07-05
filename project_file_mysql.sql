@@ -241,5 +241,73 @@ join authors AS a ON b.author_id= a.author_id ;
 
 select b.title,avg(r.rating) as avg_rating from books as b  join reviews as r  where  b.book_id=r.book_id group by b.title;
 -- corelated sub query
-select title,(select avg(rating) from reviews as r ) from 
+-- select title,(select avg(rating) from reviews as r ) from
 
+
+
+
+-- running total of order per customer
+
+-- get the author with avg(rating) get item the view
+-- which author have hight book rating only show particulure information for the user which have minimum 2 review.alter
+
+select c.name,c.customer_id , count(o.order_id) as total_book_order from customers as c join orders as o where c.customer_id=o.customer_id group by c.customer_id order by o.order_id;
+SELECT 
+    c.name,
+    c.customer_id,
+    COUNT(o.order_id) AS total_book_order
+FROM 
+    customers AS c
+JOIN 
+    orders AS o 
+    ON c.customer_id = o.customer_id
+GROUP BY 
+    c.name, c.customer_id
+ORDER BY 
+    total_book_order DESC;
+show tables;
+
+
+SELECT a.name,b.book_id, avg(r.rating)  from books as b join reviews as r on b.book_id= r.book_id
+join authors as a on a.author_id = b.author_id ;
+
+-- which author have hight book rating only show particulure information for the user which have minimum 2 review.alter
+
+SELECT a.name,b.book_id, avg(r.rating) as rating from books as b join reviews as r on b.book_id= r.book_id
+join authors as a on a.author_id = b.author_id  where rating>2;
+
+
+
+-- day 2 project works
+
+-- to fin
+
+select c.customer_id,c.name,round(avg(total_amount),2) as total_avg ,
+rank() over( order by avg(total_amount) desc)
+from customers as c
+join orders as o where c.customer_id =o.customer_id
+group by customer_id;
+
+
+select * from books;
+select * from order_items;
+
+-- you need to find out most selling books in each by joner
+
+select oi.book_id,b.title, b.genre , rank() over( partition by  b.genre order by sum(oi.quantity)) as top_most_book from books as b join order_items as oi where b.book_id = oi.book_id  ;
+
+
+-- new 
+
+with cte as 
+(select b.genre,b.book_id, b.title, sum(o.quantity),
+rank() over(partition by b.genre order by sum(o.quantity) desc ) as total_rank
+from books as b join order_items as o 
+where b.book_id = o.book_id
+group by  b.genre,b.book_id)
+
+select * from cte;
+
+
+-- 1. find those books whihc are  sold together 
+-- 2. make the trigger , order count , keep counting , auto matice set the , count who many order_items in data insert give me how many order are placed 
